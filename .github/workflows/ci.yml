@@ -17,6 +17,9 @@ jobs:
           POSTGRES_USER: appuser
           POSTGRES_PASSWORD: apppass
           POSTGRES_DB: test_db
+        ports:
+          # Map the container port to the host
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -42,12 +45,13 @@ jobs:
     - name: Run backend tests
       working-directory: ./backend
       run: |
-        export DATABASE_URL="postgresql://appuser:apppass@postgres:5432/test_db"
+        # Use localhost as the hostname for the service container
+        export DATABASE_URL="postgresql://appuser:apppass@localhost:5432/test_db"
         export SECRET_KEY="ci-test-secret-key"
         export PYTHONPATH=.
         venv/bin/pytest
 
-    # Frontend Build (no tests)
+    # Frontend Build
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
