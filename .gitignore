@@ -1,0 +1,17 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# Node.js
+node_modules/
+dist/
+npm-debug.log
+
+# IDE / OS files
+.vscode/
+.idea/
+*.DS_Store

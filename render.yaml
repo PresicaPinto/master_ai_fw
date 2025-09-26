@@ -1,0 +1,41 @@
+services:
+  # A PostgreSQL database
+  - name: db
+    type: pserv
+    plan: free
+    postgres:
+      version: 15
+
+  # The Flask Backend
+  - name: backend
+    type: web
+    plan: free
+    env: python
+    dockerfilePath: ./backend/Dockerfile.dev # We use the dev dockerfile for simplicity
+    dockerContext: ./backend
+    envVars:
+      - key: FLASK_APP
+        value: wsgi.py
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false # This marks it as a secret to be set in the Render dashboard
+
+  # The Vue.js Frontend
+  - name: frontend
+    type: web
+    plan: free
+    env: static
+    dockerfilePath: ./frontend/Dockerfile.dev
+    dockerContext: ./frontend
+    staticPublishPath: ./dist # Path to built static files
+    dockerCommand: npm run build # Command to build the static files
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
