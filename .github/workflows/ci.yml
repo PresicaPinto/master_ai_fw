@@ -14,23 +14,37 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Backend Build
+    # Backend Tests
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+
     - name: Install backend dependencies
       working-directory: ./backend
-      run: pip install -r requirements.txt
+      run: |
+        python -m venv venv
+        # We don't need psycopg2 for sqlite tests, but it's in requirements.txt
+        # The runner has build tools to handle it, so this is fine.
+        venv/bin/pip install -r requirements.txt
+
+    - name: Run backend tests with SQLite
+      working-directory: ./backend
+      run: |
+        # By NOT setting DATABASE_URL, config.py will fallback to sqlite
+        export PYTHONPATH=.
+        venv/bin/pytest
 
     # Frontend Build
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
+
     - name: Install frontend dependencies
       working-directory: ./frontend
       run: npm install
+
     - name: Build frontend
       working-directory: ./frontend
       run: npm run build
