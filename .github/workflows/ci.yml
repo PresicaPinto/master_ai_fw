@@ -21,17 +21,16 @@ jobs:
         python-version: '3.11'
 
     - name: Install backend dependencies
+      working-directory: ./backend
       run: |
-        cd backend
         python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
+        venv/bin/pip install -r requirements.txt
 
     - name: Run backend tests
+      working-directory: ./backend
       run: |
-        cd backend
-        source venv/bin/activate
-        pytest
+        export PYTHONPATH=.
+        venv/bin/pytest
 
     # Frontend Tests
     - name: Set up Node.js
@@ -40,11 +39,9 @@ jobs:
         node-version: '18'
 
     - name: Install frontend dependencies
-      run: |
-        cd frontend
-        npm install
+      working-directory: ./frontend
+      run: npm install
 
     - name: Run frontend tests
-      run: |
-        cd frontend
-        npm run test:unit
+      working-directory: ./frontend
+      run: npm run test:unit
